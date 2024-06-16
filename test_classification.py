@@ -13,8 +13,8 @@ mp_drawing_styles = mp.solutions.drawing_styles
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.5)
 
 # 加载训练好的KNN模型和标签编码器
-knn = joblib.load('knn_gesture_model.pkl')
-label_encoder = joblib.load('label_encoder.pkl')
+knn = joblib.load('user_knn_gesture_model.pkl')
+label_encoder = joblib.load('user_label_encoder.pkl')
 
 # 设定距离阈值
 distance_threshold = 0.5  # 根据需要调整此值

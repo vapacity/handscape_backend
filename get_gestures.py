@@ -17,7 +17,7 @@ handtype:
 5   🤌
 '''
 # 初始化gesture_code
-gesture_code = 4
+gesture_code = 10
 # 初始化MediaPipe Hands
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -88,7 +88,7 @@ while cap.isOpened():
                 image_filename = os.path.join(save_path, f"frame_{int(current_time)}.png")
                 cv2.imwrite(image_filename, frame)
                 
-                                # 保存关键点信息
+                # 保存关键点信息
                 landmarks = [{
                     "x": landmark.x,
                     "y": landmark.y,
