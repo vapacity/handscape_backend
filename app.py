@@ -219,9 +219,36 @@ def handle_record(data):
     processing_time = (end_time - start_time) * 1000  # 计算处理时间并转换为毫秒
     print(f'处理一帧图像所需时间: {processing_time:.2f} 毫秒')
 
+
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
 @socketio.on('train_and_get_meaning')
 def handel_meaning(data):
+    # 数据路径
+    max_num = get_last_num(base_path='my_gestures')
+    data_paths =[]
+    for i in range(max_num+1):
+        data_paths.append(f"my_gestures\data_{i}")
     
+    # 加载数据
+    X = []
+    y = []
+    for data_path in data_paths:
+        for filename in os.listdir(data_path):
+            if filename.endswith(".json"):
+                with open(os.path.join(data_path, filename), 'r') as f:
+                    data = json.load(f)
+                    # 提取关键点信息
+                    landmarks = data["landmarks"]
+                    if landmarks 
+                    feature_vector = []
+                    for lm in landmarks:
+                        feature_vector.extend([lm["x"], lm["y"], lm["z"]])
+                    X.append(feature_vector)
+                    y.append(data["hand_type"])  # 使用手势类别标签
+    X = np.array(X)
+    y = np.array(y)
+    pass
 
 @socketio.on_error()
 def error_handler(e):
