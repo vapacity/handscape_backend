@@ -159,7 +159,7 @@ def handle_record(data):
         results = hands.process(frame)
         gesture_label = '-1'
         landmarks_data = []
-
+        max_num = get_last_num('my_gestures')
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
                 # 自定义绘制手部关键点和连接线
@@ -178,7 +178,7 @@ def handle_record(data):
 
                 # 保存特征点数据
                 landmarks_data={
-                    'hand_type': 6,  # 需更改
+                    'hand_type': max_num,  # 需更改
                     'landmarks': [{"x": float(lm[0]), "y": float(lm[1]), "z": float(lm[2])} for lm in normalized_landmarks]
                 }
 
@@ -262,7 +262,7 @@ def handle_meaning(data):
     for data_path in data_paths:
         for filename in os.listdir(data_path):
             if filename.endswith(".json"):
-                with open(os.path.join(data_path, filename), 'rw') as f:
+                with open(os.path.join(data_path, filename), 'r') as f:
                     data = json.load(f)
                     # 提取键点信息
                     if not bool(data):
@@ -274,7 +274,6 @@ def handle_meaning(data):
                     for lm in landmarks:
                         feature_vector.extend([lm["x"], lm["y"], lm["z"]])
                     X.append(feature_vector)
-                    data['hand_type'] = max_num
                     y.append(data['hand_type'])  # 使用手势类别标签
     print(2)                   
     X = np.array(X)
@@ -302,9 +301,6 @@ def handle_meaning(data):
 @socketio.on('try')
 def handle_image(data):
 
-    knn = joblib.load('user_knn_gesture_model.pkl')
-    label_encoder = joblib.load('user_label_encoder.pkl')
-
     start_time = time.time()  # 记录开始时间
     try:
         print('接收到的图像数据:', data['image'][:100])  # 只打印前100个字符以检查数据是否接收
@@ -318,6 +314,9 @@ def handle_image(data):
         # 翻转图像
         frame = cv2.flip(frame, 1)
 
+        knn = joblib.load('user_knn_gesture_model.pkl')
+        label_encoder = joblib.load('user_label_encoder.pkl')
+        
         # 检测手部
         results = hands.process(frame)
         gesture_label = '-1'
@@ -350,9 +349,22 @@ def handle_image(data):
         frame_data = base64.b64encode(buffer).decode('utf-8')
         gesture_label = int(gesture_label)
 
+        # 打开gestureinf用于回传手势信息
+        # for filename in os.listdir('gesture_inf'):
+        #     if filename.endswith(f'{gesture_label}.json'):
+        #         with open(os.path.join('gesture_inf', filename), 'r') as f:
+        #             print("filename",filename)
+        #             gesture_inf = json.load(f)
+        #             gesture_name = gesture_inf['gesture_name']
+        #             gesture_country = gesture_inf['country_name']
+        #             gesture_des = gesture_inf['gesture_des']
+                    
         data = {
             'gesture': gesture_label,
-            'image': frame_data
+            'image': frame_data,
+            # 'name':gesture_name,
+            # 'country':gesture_country,
+            # 'des':gesture_des
         }
 
         json_data = json.dumps(data)
